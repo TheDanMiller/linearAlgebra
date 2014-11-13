@@ -1,0 +1,284 @@
+<html>
+<head>
+<title>Dr. Miller's Row Reducer</title>
+</head>
+<style>
+#container{
+	width:800px;
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+}
+</style>
+<script>
+var nameSpace = {};
+
+(function () {
+
+//Our matrix object
+var matrix = {
+	"r1":new Array(),
+	"r2":new Array(),
+	"r3":new Array(),
+	"r4":new Array(),
+	"r5":new Array(),
+	"r6":new Array(),
+	"r7":new Array(),
+	"r8":new Array(),
+	maxCol:0,
+	maxRow:0
+};
+
+
+nameSpace.reduce = function() {
+	//Similar to main.  This is the order of the function calls
+	isNumeric();
+	getMaxBound();
+	populateRows();
+
+	hardPart();
+	printResults();
+	clearArray();
+}
+function printResults() {
+	//prints the results of the reduction
+	document.getElementById("results").value = "Results";
+	for (var i = 1; i <= matrix.maxRow; i++) {
+		document.getElementById("results").value += "\n";
+		for (var j = 0; j < matrix.maxCol; j++) {
+			document.getElementById("results").value += matrix["r"+i][j].toFixed(2) + "\t";
+		}
+	}
+}
+function hardPart() {
+	//loops through setting up the work for the killRow() function
+	var counter = 1;
+	var flag=false;
+
+	for (var i = 1; i <= matrix.maxCol; i++) {
+		flag = false;
+		if(counter > matrix.maxRow || counter >matrix.maxCol+1)
+			break;
+		if (matrix["r"+counter][i-1] == 0) {
+			
+			flag = swap(i);
+		
+			
+		}
+		if (flag)
+			continue;
+		killRow(counter,i-1);
+		counter++;
+	}
+		
+	
+}
+
+function killRow(row,col) {
+	//This is where the reduction is done
+	if(matrix["r"+row][col]!=1)
+	{
+		var denominator = matrix["r"+row][col];
+
+		//reduce whole row
+		for(var i =0;i<matrix.maxCol;i++)
+		{
+			matrix["r"+row][i] /= denominator;
+		}
+	}
+	
+	//subtract from other rows
+	for(var i = 1; i<=matrix.maxRow;i++)
+	{
+		if(i==row) continue;
+		var factorForRow = matrix["r"+i][col];
+		for(var j =col;j<matrix.maxCol;j++)
+		{
+			matrix["r"+i][j]-=factorForRow*matrix["r"+row][j]
+		}
+	
+	}
+	
+}
+
+function swap(swapDown) {
+	//Swap Rows if row has leading 0 when it should not
+	for (var i = swapDown + 1; i <= matrix.maxRow; i++) {
+		if (matrix["r"+i][swapDown-1] != 0) {
+			var temp = matrix["r"+swapDown].slice(0);
+			matrix["r"+swapDown] = matrix["r"+i].slice(0);
+			matrix["r"+i] = temp.slice(0);
+			return false;
+		}
+	}
+	return true;
+}
+function getMaxBound() {
+	//gets the size of matrix being reduced
+	for (var i = 1; i <= 8; i++) {
+		for (var j = 1; j <=8; j++) {
+			var place = "r"+i+"c"+j;
+			if (document.getElementById(place).value != "") {
+				if(i>matrix.maxRow)
+					matrix.maxRow = i;
+				if(j>matrix.maxCol)
+					matrix.maxCol = j;
+			}
+		}
+	}
+}
+
+function populateRows() {
+	//copies the inputs from the input tags into the matrix object
+	for (var i = 1; i <= matrix.maxRow; i++) {
+		for (var j = 1; j <= matrix.maxCol; j++) {
+
+			var place = "r"+i+"c"+j;
+			
+			if (document.getElementById(place).value != "") {
+			
+				matrix["r"+i].push(parseFloat(document.getElementById(place).value));
+				
+			}
+			else {
+				matrix["r"+i].push(parseFloat(0));
+				document.getElementById(place).value = 0;
+			}
+		}
+	}
+}
+nameSpace.clearInputs = function() {
+	//for resetting the external array inputs between reductions
+	for (var i = 1; i <= 8; i++) {
+		for (var j = 1; j <=8; j++) {
+			var place = "r"+i+"c"+j;
+			document.getElementById(place).value = "";
+		}
+	}
+	document.getElementById("results").value = "Results";
+}
+
+function isNumeric() {
+	//Replace all non-numerics with 0
+	for (var i = 1; i <= 8; i++) {
+		for (var j = 1; j <=8; j++) {
+			var place = "r"+i+"c"+j;
+			if (isNaN(document.getElementById(place).value))
+				document.getElementById(place).value = 0.0;
+		}
+	}
+}
+
+function clearArray() {
+	//for resetting the internal array structure between reductions
+	for (var i = 1; i <=8; i++) {
+		matrix["r"+i] = new Array();
+	}
+	matrix.maxRow = 0;
+	matrix.maxCol = 0;
+}
+})();
+</script>
+<body bgcolor="#bcc6cc" >
+<div id="container" style="container">
+<h1>Row Reduction Tool</h1>
+<hr style="color:#000000"/>
+<!-- Row 1 -->
+<input id="r1c1" size="8">
+<input id="r1c2" size="8">
+<input id="r1c3" size="8">
+<input id="r1c4" size="8">
+<input id="r1c5" size="8">
+<input id="r1c6" size="8">
+<input id="r1c7" size="8">
+<input id="r1c8" size="8">
+<hr style="color:#666666"/>
+
+<!-- Row 2 -->
+<input id="r2c1" size="8">
+<input id="r2c2" size="8">
+<input id="r2c3" size="8">
+<input id="r2c4" size="8">
+<input id="r2c5" size="8">
+<input id="r2c6" size="8">
+<input id="r2c7" size="8">
+<input id="r2c8" size="8">
+<hr style="color:#666666"/>
+
+<!-- Row 3 -->
+<input id="r3c1" size="8">
+<input id="r3c2" size="8">
+<input id="r3c3" size="8">
+<input id="r3c4" size="8">
+<input id="r3c5" size="8">
+<input id="r3c6" size="8">
+<input id="r3c7" size="8">
+<input id="r3c8" size="8">
+<hr style="color:#666666"/>
+
+<!-- Row 4 -->
+<input id="r4c1" size="8">
+<input id="r4c2" size="8">
+<input id="r4c3" size="8">
+<input id="r4c4" size="8">
+<input id="r4c5" size="8">
+<input id="r4c6" size="8">
+<input id="r4c7" size="8">
+<input id="r4c8" size="8">
+<hr style="color:#666666"/>
+
+<!-- Row 5 -->
+<input id="r5c1" size="8">
+<input id="r5c2" size="8">
+<input id="r5c3" size="8">
+<input id="r5c4" size="8">
+<input id="r5c5" size="8">
+<input id="r5c6" size="8">
+<input id="r5c7" size="8">
+<input id="r5c8" size="8">
+<hr style="color:#666666"/>
+
+<!-- Row 6 -->
+<input id="r6c1" size="8">
+<input id="r6c2" size="8">
+<input id="r6c3" size="8">
+<input id="r6c4" size="8">
+<input id="r6c5" size="8">
+<input id="r6c6" size="8">
+<input id="r6c7" size="8">
+<input id="r6c8" size="8">
+<hr style="color:#666666"/>
+
+<!-- Row 7 -->
+<input id="r7c1" size="8">
+<input id="r7c2" size="8">
+<input id="r7c3" size="8">
+<input id="r7c4" size="8">
+<input id="r7c5" size="8">
+<input id="r7c6" size="8">
+<input id="r7c7" size="8">
+<input id="r7c8" size="8">
+<hr style="color:#666666"/>
+
+<!-- Row 8 -->
+<input id="r8c1" size="8">
+<input id="r8c2" size="8">
+<input id="r8c3" size="8">
+<input id="r8c4" size="8">
+<input id="r8c5" size="8">
+<input id="r8c6" size="8">
+<input id="r8c7" size="8">
+<input id="r8c8" size="8">
+<hr style="color:#666666"/>
+
+<input type="button" value="Reduce" onclick="nameSpace.reduce()">
+<input type="button" value="Clear" onclick="nameSpace.clearInputs()"><br /><br />
+<textarea id="results" rows="20" cols="80">Results:</textarea>
+<br /><br />
+<p><i> Row Reduction Tool Created for Dr. Miller, Slippery Rock University <br />
+		Created by Christopher Solomon and Dan Miller, class of 2014 <br />
+		This code licensed under the MIT license </i></p>
+</div>
+
+</body>
+</html>
